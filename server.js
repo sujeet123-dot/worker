@@ -26,7 +26,7 @@ function getGaIdentifiers(req) {
     const sessionId = sessionCookie.split('.')[2] || Math.round(Date.now() / 1000).toString();
     
     // Get real user IP from Render's headers
-    const userIp = req.ip; 
+    const userIp = (req.headers['x-forwarded-for'] || req.ip || '').split(',')[0].trim().replace('::ffff:', ''); 
     const userAgent = req.headers['user-agent'] || 'Mozilla/5.0';
 
     return { clientId, sessionId, userIp, userAgent };
@@ -41,16 +41,21 @@ async function sendGaPing(ids, eventName, extraParam={}) {
         cid: ids.clientId,
         dl: TARGET_URL,
         sid: ids.sessionId,
-        uip: ids.userIp,    // <--- FIXES THE LOCATION (India vs US)
+        uip: ids.userIp,
+        _uip: ids.userIp,    // <--- FIXES THE LOCATION (India vs US)
         en: eventName,
         seg: '1',
         _dbg: '1',
+        z: Math.floor(Math.random() * 1000000000).toString(),
         ...extraParam 
       });
 
     try {
         await gaClient.get(`https://www.google-analytics.com/g/collect?${params.toString()}`, {
-            headers: { 'User-Agent': ids.userAgent }
+            headers: { 
+                'User-Agent': ids.userAgent,
+                'X-Forwarded-For': ids.userIp 
+            }
         });
         console.log(`[GA4] ${eventName} sent for IP: ${ids.userIp}`);
     } catch (err) {
@@ -67,7 +72,7 @@ app.all('/', (req, res) => {
     const scrollDelay = Math.floor(Math.random() * (45000 - 30000 + 1) + 30000);
     setTimeout(() => {
         sendGaPing(ids, 'scroll', {
-          'ep.page_location': TARGET_URL,
+          // 'ep.page_location': TARGET_URL,
           'epn.percent_scrolled': 90,
           '_et': scrollDelay.toString() // This locks in the 30-45s engagement
         });
