@@ -62,7 +62,7 @@ app.all('/', (req, res) => {
     const ids = getGaIdentifiers(req);
 
     // 1. Immediate Warm-up (Registers the user in India)
-    sendGaPing(ids, 'session_startzm');
+    sendGaPing(ids, 'page_view');
 
     const scrollDelay = Math.floor(Math.random() * (45000 - 30000 + 1) + 30000);
     setTimeout(() => {
