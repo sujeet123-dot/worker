@@ -33,9 +33,7 @@ function getGaIdentifiers(req) {
 }
 
 async function sendGaPing(ids, eventName, extraParam={}) {     
-      const interval = Math.floor(Math.random() * (2000 -  + 1) + 1000);
-      await new Promise(resolve => setTimeout(resolve, interval));
-      engagementTime += interval;
+      
 
       const params = new URLSearchParams({
         v: '2',
