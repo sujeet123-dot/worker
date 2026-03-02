@@ -12,7 +12,7 @@ const gaClient = axios.create({
     timeout: 10000
 });
 
-const TARGET_URL = "https://www.zenithummedia.com/case-studies?utm_source=google&utm_medium=medium&utm_campaign=DEBUG&utm_id=Visit_frame";
+const TARGET_URL = "https://www.zenithummedia.com/case-studies?utm_source=google&utm_medium=medium&utm_campaign=SHUBHAMPANDEY&utm_id=Visit_frame";
 const MEASUREMENT_ID = "G-SNCY0K36MC";
 
 
@@ -35,13 +35,24 @@ async function runServerSideTracking(ids) {
 
 async function sendPing(ids, eventName, extraParams = {}) {
     const params = new URLSearchParams({
-        v: '2', tid: MEASUREMENT_ID, cid: ids.clientId, sid: ids.sessionId,
-        uip: ids.userIp, _uip: ids.userIp, dl: TARGET_URL, en: eventName,
-        seg: '1', _dbg: '1', ...extraParams
+        v: '2', 
+        tid: MEASUREMENT_ID, 
+        cid: ids.clientId, 
+        sid: ids.sessionId,
+        uip: ids.userIp, 
+        _uip: ids.userIp, 
+        dl: TARGET_URL, 
+        en: eventName,
+        seg: '1', 
+        _dbg: '1', 
+        ...extraParams
     });
     try {
         await gaClient.get(`https://www.google-analytics.com/g/collect?${params.toString()}`, {
-            headers: { 'User-Agent': ids.userAgent, 'X-Forwarded-For': ids.userIp }
+            headers: { 
+                'User-Agent': ids.userAgent, 
+                'X-Forwarded-For': ids.userIp 
+            }
         });
     } catch (e) {}
 }
@@ -51,11 +62,18 @@ app.all('/', (req, res) => {
     const userIp = (req.headers['x-forwarded-for'] || req.ip || '').split(',')[0].trim().replace('::ffff:', '');
     const userAgent = req.headers['user-agent'] || 'Mozilla/5.0';
 
+    const gaCookie = req.cookies['_ga'] || '';
+    const clientId = gaCookie.split('.').slice(-2).join('.') || `100.${Date.now()}`;
+    
+    const sidKey = `_ga_${MEASUREMENT_ID.slice(2)}`;
+    const sessionCookie = req.cookies?.[sidKey] || '';
+    const sessionId = sessionCookie.split('.')[2] || Math.round(Date.now() / 1000).toString();
+    
     // We don't have cookies yet because the browser hasn't hit us.
     // We generate temporary IDs to pass to the server worker.
     const ids = {
-        clientId: `100.${Math.round(Math.random() * 1000000000)}`,
-        sessionId: Math.round(Date.now() / 1000).toString(),
+        clientId: clientId,
+        sessionId: sessionId,
         userIp,
         userAgent
     };
