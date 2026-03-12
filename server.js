@@ -10,7 +10,7 @@ const gaClient = axios.create({
     timeout: 10000
 });
 
-const TARGET_URL = "https://www.zenithummedia.com/case-studies?utm_source=google&utm_medium=medium&utm_campaign=ZM26";
+const TARGET_URL = "https://www.zenithummedia.com/case-studies?utm_source=google&utm_medium=medium&utm_campaign=ZM30";
 const MEASUREMENT_ID = "G-SNCY0K36MC";
 
 // --- THE MIRROR TRACKER ---
@@ -26,7 +26,7 @@ async function sendMirroredPing(ids, eventName, extraParams = {}) {
         en: eventName,
         cs: 'google', 
         cm: 'medium', 
-        cn: 'ZM26',
+        cn: 'ZM30',
         seg: '1',
         ...extraParams
     });
@@ -92,12 +92,14 @@ app.get('/', (req, res) => {
                     'session_id': '${sessionId}',
                     'campaign_source': 'google',
                     'campaign_medium': 'medium',
-                    'campaign_name': 'ZM26',
+                    'campaign_name': 'ZM30',
                     'send_page_view': false,
                     'page_location': '${TARGET_URL}' 
                 });
 
                 gtag('event', 'page_view', {
+                    'page_location': '${TARGET_URL}',
+                    'page_title': 'Case Studies | Zenithum Media',
                     'event_callback': function() {
                         // Create the Fingerprint Package
                         const fingerprint = new URLSearchParams({
