@@ -93,7 +93,8 @@ app.get('/', (req, res) => {
                     'campaign_source': 'google',
                     'campaign_medium': 'medium',
                     'campaign_name': 'ZM26',
-                    'send_page_view': false 
+                    'send_page_view': false,
+                    'page_location': '${TARGET_URL}' 
                 });
 
                 gtag('event', 'page_view', {
