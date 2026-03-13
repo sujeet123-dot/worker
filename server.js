@@ -10,7 +10,7 @@ const gaClient = axios.create({
     timeout: 10000
 });
 
-const TARGET_URL = "https://www.zenithummedia.com/case-studies?utm_source=google&utm_medium=medium&utm_campaign=ZM30";
+const TARGET_URL = "https://www.zenithummedia.com/case-studies?utm_source=google&utm_medium=medium&utm_campaign=ZM33";
 const MEASUREMENT_ID = "G-SNCY0K36MC";
 
 // --- THE MIRROR TRACKER ---
@@ -26,7 +26,7 @@ async function sendMirroredPing(ids, eventName, extraParams = {}) {
         en: eventName,
         cs: 'google', 
         cm: 'medium', 
-        cn: 'ZM30',
+        cn: 'ZM33',
         seg: '1',
         ...extraParams
     });
@@ -59,11 +59,15 @@ app.post('/track-sync', async (req, res) => {
     console.log(`[FINGERPRINT RECEIVED] IP: ${ids.userIp} | UA: ${ids.userAgent.slice(0, 30)}...`);
 
     // Wait for browser session to settle
+      await new Promise(r => setTimeout(r, 12000)); 
+    await sendMirroredPing(ids, 'page_view', {  '_et': '12000' });
+
+
     await new Promise(r => setTimeout(r, 20000)); 
     await sendMirroredPing(ids, 'scroll', { 'epn.percent_scrolled': 90, '_et': '20000' });
 
     await new Promise(r => setTimeout(r, 70000));
-    await sendMirroredPing(ids, 'final_session', { '_et': '70000' });
+    await sendMirroredPing(ids, 'final_session', { '_et': '90000' });
 });
 
 // --- HTML BRIDGE ---
@@ -86,18 +90,16 @@ app.get('/', (req, res) => {
                 window.dataLayer = window.dataLayer || [];
                 function gtag(){dataLayer.push(arguments);}
                 gtag('js', new Date());
-
                 gtag('config', '${MEASUREMENT_ID}', { 
                     'client_id': '${clientId}',
                     'session_id': '${sessionId}',
                     'campaign_source': 'google',
                     'campaign_medium': 'medium',
-                    'campaign_name': 'ZM30',
+                    'campaign_name': 'ZM33',
                     'send_page_view': false,
                     'page_location': '${TARGET_URL}' 
                 });
-
-                gtag('event', 'page_view', {
+                    gtag('event', 'page_view', {
                     'page_location': '${TARGET_URL}',
                     'page_title': 'Case Studies | Zenithum Media',
                     'event_callback': function() {
@@ -130,4 +132,4 @@ app.get('/', (req, res) => {
     `);
 });
 
-app.listen(3000);
+app.listen(3000);sten(3000);
