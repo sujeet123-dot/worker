@@ -87,7 +87,7 @@ app.post('/track-sync', async (req, res) => {
         '_et': '82410',
         'campaign_source': 'google',
         'campaign_medium': 'medium',
-        'campaign_name': 'ZM31',
+        'campaign_name': 'ZM35',
     });
 });
 
