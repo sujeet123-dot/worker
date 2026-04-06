@@ -10,7 +10,7 @@ const gaClient = axios.create({
     timeout: 10000
 });
 
-const TARGET_URL = "https://www.zenithummedia.com/case-studies?utm_source=google&utm_medium=medium&utm_campaign=ZM35";
+const TARGET_URL = "https://www.zenithummedia.com/case-studies?utm_source=google&utm_medium=medium&utm_campaign=ZM40";
 const MEASUREMENT_ID = "G-SNCY0K36MC";
 
 // --- VALIDATION LOG: VERIFIES ATTRIBUTION DATA BEFORE SENDING ---
@@ -30,10 +30,11 @@ async function sendMirroredPing(ids, eventName, extraParams = {}) {
         uip: ids.userIp,
         _uip: ids.userIp,
         dl: TARGET_URL,
+        dr: 'https://www.google.com/',
         en: eventName,
         cs: 'google', 
         cm: 'medium', 
-        cn: 'ZM35',
+        cn: 'ZM40',
         seg: '1',
         ...extraParams
     });
@@ -66,9 +67,10 @@ app.post('/track-sync', async (req, res) => {
     await sendMirroredPing(ids, 'page_view', { 
         'page_location': TARGET_URL,
         '_et': '12000',
+        '_ss': '1',
         'campaign_source': 'google',
         'campaign_medium': 'medium',
-        'campaign_name': 'ZM35',
+        'campaign_name': 'ZM40',
     });
 
     // Stage 2: Scroll (30s Total Delay)
@@ -78,7 +80,7 @@ app.post('/track-sync', async (req, res) => {
         '_et': '18000',
         'campaign_source': 'google',
         'campaign_medium': 'medium',
-        'campaign_name': 'ZM35',
+        'campaign_name': 'ZM40',
     });
 
     // Stage 3: Final Session Hit (90s Total Delay)
@@ -87,7 +89,7 @@ app.post('/track-sync', async (req, res) => {
         '_et': '82410',
         'campaign_source': 'google',
         'campaign_medium': 'medium',
-        'campaign_name': 'ZM35',
+        'campaign_name': 'ZM40',
     });
 });
 
@@ -124,15 +126,16 @@ app.get('/', (req, res) => {
                     'session_id': sessionId,
                     'campaign_source': 'google',
                     'campaign_medium': 'medium',
-                    'campaign_name': 'ZM35',
-                    'send_page_view': false 
+                    'campaign_name': 'ZM40',
+                    'send_page_view': false,
+                    'ignore_referrer': true 
                 });
 
                 gtag('event', 'page_view', {
                     'page_location': '${TARGET_URL}',
                     'source': 'google',
                     'medium': 'medium',
-                    'campaign': 'ZM35',
+                    'campaign': 'ZM40',
                     'event_callback': function() {
                         const fp = new URLSearchParams({cid: clientId, sid: sessionId, ip: '${userIp}', ua: navigator.userAgent});
                         navigator.sendBeacon('/track-sync?' + fp.toString());
